@@ -5,10 +5,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,16 +22,18 @@ public class Main {
     public static void main(String[] args) throws ParserConfigurationException,
             SAXException, IOException {
         String[] columnMapping = {"id", "firstName", "lastName", "country", "age"};
-        String fileName = "data.csv";
 
+        String fileName = "data.csv";
         List<Employee> list = parseCSV(columnMapping, fileName);
         String json = listToJson(list);
         writeString(json,"data.json");
 
         String fileNameXml = "data.xml";
         List<Employee> listXml = parseXML(fileNameXml);
-        String jsonXML = listToJson(listXml);
-        writeString(jsonXML, "data1.json");
+     //  String jsonXML = listToJson(listXml);
+     //  writeString(jsonXML, "data1.json");
+
+
     }
 
     public static List<Employee> parseCSV(String[] columnMapping, String filename){
@@ -77,22 +76,43 @@ public class Main {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(new File(fileName));
 
-        NodeList employeeElements = doc.getDocumentElement().getElementsByTagName("employee");
-        for(int i = 0; i < employeeElements.getLength(); i++){
-            Node employee = employeeElements.item(i);
-            NamedNodeMap attributes = employee.getAttributes();
+        NodeList nodeList = doc.getDocumentElement().getElementsByTagName("employee");
+        for(int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                Element element = (Element) node;
+                NamedNodeMap map = element.getAttributes();
 
-            String tempId = attributes.getNamedItem("id").getNodeValue();
-            long id = Long.parseLong(tempId);
-            String firstName = attributes.getNamedItem("firstName").getNodeValue();
-            String lastName = attributes.getNamedItem("lastName").getNodeValue();
-            String country = attributes.getNamedItem("country").getNodeValue();
-            String tempAge = attributes.getNamedItem("age").getNodeValue();
-            int age = Integer.parseInt(tempAge);
+                String tempId = map.getNamedItem("id").getNodeValue();
+                long id = Long.parseLong(tempId);
+                String firstName = map.getNamedItem("firstName").getNodeValue();
+                String lastName = map.getNamedItem("lastName").getNodeValue();
+                String country = map.getNamedItem("country").getNodeValue();
+                String tempAge = map.getNamedItem("age").getNodeValue();
+                int age = Integer.parseInt(tempAge);
+                staff.add(new Employee(id, firstName, lastName, country, age));
 
-            staff.add(new Employee(id,firstName,lastName,country,age));
-
+            }
         }
         return staff;
     }
+/*
+    private static void read(Node node) {
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node_ = nodeList.item(i);
+            if (Node.ELEMENT_NODE == node_.getNodeType()) {
+                System.out.println("Текущий узел: " + node_.getNodeName());
+                Element element = (Element) node_;
+                NamedNodeMap map = element.getAttributes();
+                for (int a = 0; a < map.getLength(); a++) {
+                    String attrName = map.item(a).getNodeName();
+                    String attrValue = map.item(a).getNodeValue();
+                    System.out.println("Атрибут: " + attrName + "; значение: " + attrValue);
+                }
+                read(node_);
+            }
+        }
+    }   //Используем рекурсию для чтения документа:
+*/
 }
