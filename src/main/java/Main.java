@@ -30,10 +30,8 @@ public class Main {
 
         String fileNameXml = "data.xml";
         List<Employee> listXml = parseXML(fileNameXml);
-     //  String jsonXML = listToJson(listXml);
-     //  writeString(jsonXML, "data1.json");
-
-
+        String jsonXML = listToJson(listXml);
+        writeString(jsonXML, "data1.json");
     }
 
     public static List<Employee> parseCSV(String[] columnMapping, String filename){
@@ -81,15 +79,12 @@ public class Main {
             Node node = nodeList.item(i);
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 Element element = (Element) node;
-                NamedNodeMap map = element.getAttributes();
 
-                String tempId = map.getNamedItem("id").getNodeValue();
-                long id = Long.parseLong(tempId);
-                String firstName = map.getNamedItem("firstName").getNodeValue();
-                String lastName = map.getNamedItem("lastName").getNodeValue();
-                String country = map.getNamedItem("country").getNodeValue();
-                String tempAge = map.getNamedItem("age").getNodeValue();
-                int age = Integer.parseInt(tempAge);
+                long id = Long.parseLong(element.getElementsByTagName("id").item(0).getTextContent());
+                String firstName = element.getElementsByTagName("firstName").item(0).getTextContent();
+                String lastName = element.getElementsByTagName("lastName").item(0).getTextContent();
+                String country = element.getElementsByTagName("country").item(0).getTextContent();
+                int age = Integer.parseInt(element.getElementsByTagName("age").item(0).getTextContent());
                 staff.add(new Employee(id, firstName, lastName, country, age));
 
             }
